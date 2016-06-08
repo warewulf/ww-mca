@@ -1,0 +1,14 @@
+# -*- makefile -*-
+# Copyright (c) 2016      Intel, Inc. All rights reserved.
+# $COPYRIGHT$
+#
+# Additional copyrights may follow
+#
+# $HEADER$
+#
+
+# This makefile.am does not stand on its own - it is included from src/Makefile.am
+
+# Source code files
+headers += \
+	mca/mca.h
