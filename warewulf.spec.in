@@ -28,6 +28,7 @@ Source: %{name}-%{version}.tar.gz
 ExclusiveOS: linux
 Conflicts: warewulf <= 3.9
 BuildRoot: %{?_tmppath}/%{name}-%{version}-%{release}-root
+BuildRequires: libevent-devel
 Requires: perl-JSON
 
 %description
