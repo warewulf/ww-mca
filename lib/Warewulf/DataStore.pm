@@ -22,10 +22,13 @@
 package Warewulf::DataStore;
 
 use JSON;
-use Warewulf::Message;
-use Warewulf::Util;
+use Data::Dumper;
+use Warewulf::Object;
+use Warewulf::ObjectSet;
+#use Warewulf::Message;
+#use Warewulf::Util;
 
-our @ISA = ();
+our @ISA = ('Warewulf::Object');
 
 =head1 NAME
 
@@ -36,12 +39,24 @@ Warewulf::DataStore - Warewulf's data storage class
     use Warewulf::DataStore;
 
     my $ds = Warewulf::DataStore->new();
+    $ds->open("/tmp/wwtest.json");
 
-    $ds->open($type);
+    my %hash = $ds->get_hash();
 
-    my $ObjectSet = $ds->get_objects();
+    if ( my $object = $ds->get_object($id) ) {
+        $object->set("NAME", "test01");
 
-    $ds->persist($ObjectSet);
+        $ds->put_object($object);
+    }
+
+    my $o = Warewulf::Object->new();
+    $o->set("FOO", "BAR");
+    $o->set("NAME", "Test Object");
+
+    $ds->put_object($o);
+
+    $ds->persist("/tmp/wwtest.json");
+
 
 =head1 DESCRIPTION
 
@@ -73,8 +88,7 @@ new($)
 =item init(...)
 
 Initialize an object.  All data currently stored in the object will be
-cleared.  Any initializer accepted by the C<set()> method may also be
-passed to C<init()>.
+cleared. 
 
 =cut
 
@@ -86,34 +100,232 @@ init(@)
     # Clear current data from object.
     %{$self} = ();
 
-    # Check for new initializer.
-    if (scalar(@_)) {
-        $self->set(@_);
-    }
+    $self->set("JSON", JSON->new->utf8(1)->pretty(1));
 
     return $self;
 }
 
-=item open(I<type>)
+=item open()
 
-Open the datastore by a given type (e.g. node, files, vnfs, etc.)
+Open a JSON datastore file
 
 =cut
 
 sub
 open($)
 {
-    my ($self, $type) = @_;
+    my ($self, $json_file) = @_;
+    my $json = $self->get("JSON");
+
+    $self->set("FILE", $json_file);
+
+    if ( -f "$json_file" ) {
+        my $fd;
+        if ( ! open($fd, $json_file) ) {
+            printf("ERROR: Could not open $json_file\n");
+            return(undef);
+        }
+        $self->{"DATA"} = $json->decode(join("", <$fd>));
+
+        close($fd);
+    } else {
+        $self->{"DATA"}{"WAREWULF"} = {};
+    }
+
+    return(0);
+}
+
+
+
+=item persist()
+
+Persist/update the datastore
+
+=cut
+
+sub
+persist($)
+{
+    my ($self, $json_file) = @_;
+    my $json = $self->get("JSON");
+    my $fd;
+
+    if ( ! $json_file ) {
+        $json_file = $self->get("FILE");
+    }
+
+    if ( ! open($fd, ">". $json_file) ) {
+        printf("ERROR: Could not open $json_file\n");
+        return(undef);
+    }
+
+    print $fd $json->encode($self->{"DATA"});
+
+    close($fd);
 
 }
+
+
+
+=item get_hash()
+
+Return the complete perl hash of data
+
+=cut
+
+sub
+get_hash($)
+{
+    my ($self) = @_;
+    my $scalar;
+
+    if ( exists($self->{"DATA"}) ) {
+        return(%{$self->{"DATA"}{"WAREWULF"}});
+    } else {
+        printf("WARNING: No cached DATA!\n");
+    }
+
+    return(undef);
+}
+
+
+
+=item get_object()
+
+Return an Object for a particular 
+
+=cut
+
+sub
+get_objects(@)
+{
+    my ($self, @ids) = @_;
+    my $ObjectSet = Warewulf::ObjectSet->new();
+    my $count = 0;
+ 
+    if ( exists($self->{"DATA"}) ) {
+        foreach my $id ( @ids ) {
+            if ( exists($self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{$id})) {
+                my $o = Warewulf::Object->new($self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{$id});
+                $o->set("ID", $id);
+                $ObjectSet->add($o);
+                $count++;
+            }
+        }
+    }
+    if ( $count > 0 ) {
+        return($ObjectSet);
+    }
+    return(undef);
+}
+
+
+=item put_object()
+
+Push objects into JSON datastore
+
+=cut
+
+sub
+put_objects($$)
+{
+    my ($self, $o) = @_;
+    my $count = 0;
+
+    if ( ref($o) eq "Warewulf::Object" ) {
+        my $id = $o->get("ID");
+
+        if ( ! $id ) {
+            #TODO: Modularize this, and do this better
+            $id = `cat /proc/sys/kernel/random/uuid`;
+            chomp($id);
+        }
+
+        if ( exists($self->{"DATA"}) ) {
+            $self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{"$id"} = $o->get_hash();
+            $count++;
+        }
+
+    } elsif ( ref($o) eq "Warewulf::Object" ) {
+        for my $o ( $o->get_list() ) {
+            my $id = $object->get("ID");
+
+            if ( ! $id ) {
+                #TODO: Modularize this, and do this better
+                $id = `cat /proc/sys/kernel/random/uuid`;
+                chomp($id);
+            }
+
+            if ( exists($self->{"DATA"}) ) {
+                $self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{"$id"} = $object->get_hash();
+                $count++;
+            }
+        }
+    }
+
+    return($count);
+}
+
+
+=item find()
+
+Find objects based on key/value and return their IDs
+
+=cut
+
+sub
+find($$)
+{
+    my ($self, $key, $value) = @_;
+    my @ids;
+    my $count = 0;
+
+    if ( exists($self->{"DATA"}) ) {
+        foreach my $id ( keys %{$self->{"DATA"}{"WAREWULF"}{"OBJECTS"}} ) {
+            if ( exists($self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{"$id"}{"$key"}) ) {
+                if ( $self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{"$id"}{"$key"} eq $value ) {
+                    push(@ids, $id);
+                }
+            }
+        }
+    }
+
+    return(@ids);
+}
+
 
 
 =back
 
 =head1 SEE ALSO
 
-Warewulf::Object
+Warewulf::Object Warewulf::ObjectSet
 
 =cut
+
+
+
+    my $ds = Warewulf::DataStore->new();
+    $ds->open("/tmp/wwtest.json");
+
+    my @ids = $ds->find("FOO", "BAR");
+    
+    if ( my $ObjectSet = $ds->get_objects(@ids) ) {
+    printf("Updating objectset\n");
+        $ObjectSet->set("NAME", "test01");
+
+        $ds->put_objects($ObjectSet);
+    }
+
+    my $o = Warewulf::Object->new();
+    $o->set("FOO", "BAR");
+    $o->set("NAME", "Test Object");
+
+    $ds->put_objects($o);
+
+    $ds->persist("/tmp/wwtest.json");
+
+
+
 
 1;
