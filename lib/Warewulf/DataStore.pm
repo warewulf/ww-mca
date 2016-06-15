@@ -41,22 +41,21 @@ Warewulf::DataStore - Warewulf's data storage class
     my $ds = Warewulf::DataStore->new();
     $ds->open("/tmp/wwtest.json");
 
-    my %hash = $ds->get_hash();
+    my @ids = $ds->find();
 
-    if ( my $object = $ds->get_object($id) ) {
-        $object->set("NAME", "test01");
-
-        $ds->put_object($object);
+    foreach my $id ( @ids ) {
+        my $value = $ds->get_value($id, "NAME");
+        if ( $value ) {
+            print("$id: $value\n");
+        }
     }
 
-    my $o = Warewulf::Object->new();
-    $o->set("FOO", "BAR");
-    $o->set("NAME", "Test Object");
+    my $id = `cat /proc/sys/kernel/random/uuid`;
+    chomp($id);
 
-    $ds->put_object($o);
+    $ds->set_value($id, "NAME", sprintf("n%04.4s", (scalar @ids) + 1));
 
-    $ds->persist("/tmp/wwtest.json");
-
+    $ds->commit();
 
 =head1 DESCRIPTION
 
@@ -137,14 +136,14 @@ open($)
 
 
 
-=item persist()
+=item commit()
 
 Persist/update the datastore
 
 =cut
 
 sub
-persist($)
+commit($)
 {
     my ($self, $json_file) = @_;
     my $json = $self->get("JSON");
@@ -167,11 +166,85 @@ persist($)
 
 
 
-=item get_hash()
+=item get($id, $key)
 
-Return the complete perl hash of data
+Get the value from a given ID
 
 =cut
+
+sub
+get_value($$$)
+{
+    my ($self, $id, $key) = @_;
+
+    if ( exists($self->{"DATA"}) ) {
+        if ( exists($self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{$id}{$key})) {
+            return($self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{$id}{$key});
+        }
+    }
+
+    return(undef);
+}
+
+
+=item set($id, $key, $value)
+
+Set the value from a given ID
+
+=cut
+
+sub
+set_value($$$)
+{
+    my ($self, $id, $key, $value) = @_;
+    my $count = 0;
+
+    if ( exists($self->{"DATA"}) ) {
+        $self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{$id}{$key} = $value;
+        $count++;
+    }
+
+    return($count);
+}
+
+
+=item find($key, $value)
+
+Find objects based on key/value and return their IDs. If you do not
+specify a key/value, then all IDs are returned.
+
+=cut
+
+sub
+find($$$)
+{
+    my ($self, $key, $value) = @_;
+    my @ids;
+    my $count = 0;
+
+    if ( exists($self->{"DATA"}) ) {
+        foreach my $id ( keys %{$self->{"DATA"}{"WAREWULF"}{"OBJECTS"}} ) {
+            if ( $key ) {
+                if ( exists($self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{"$id"}{"$key"}) ) {
+                    if ( $self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{"$id"}{"$key"} eq $value ) {
+                        push(@ids, $id);
+                    }
+                }
+            } else {
+                push(@ids, $id);
+            }
+        }
+    }
+
+    return(@ids);
+}
+
+
+
+
+####################################################################
+## unsed
+
 
 sub
 get_hash($)
@@ -189,12 +262,6 @@ get_hash($)
 }
 
 
-
-=item get_object()
-
-Return an Object for a particular 
-
-=cut
 
 sub
 get_objects(@)
@@ -219,12 +286,6 @@ get_objects(@)
     return(undef);
 }
 
-
-=item put_object()
-
-Push objects into JSON datastore
-
-=cut
 
 sub
 put_objects($$)
@@ -266,35 +327,6 @@ put_objects($$)
     return($count);
 }
 
-
-=item find()
-
-Find objects based on key/value and return their IDs
-
-=cut
-
-sub
-find($$)
-{
-    my ($self, $key, $value) = @_;
-    my @ids;
-    my $count = 0;
-
-    if ( exists($self->{"DATA"}) ) {
-        foreach my $id ( keys %{$self->{"DATA"}{"WAREWULF"}{"OBJECTS"}} ) {
-            if ( exists($self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{"$id"}{"$key"}) ) {
-                if ( $self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{"$id"}{"$key"} eq $value ) {
-                    push(@ids, $id);
-                }
-            }
-        }
-    }
-
-    return(@ids);
-}
-
-
-
 =back
 
 =head1 SEE ALSO
@@ -302,28 +334,6 @@ find($$)
 Warewulf::Object Warewulf::ObjectSet
 
 =cut
-
-
-
-    my $ds = Warewulf::DataStore->new();
-    $ds->open("/tmp/wwtest.json");
-
-    my @ids = $ds->find("FOO", "BAR");
-    
-    if ( my $ObjectSet = $ds->get_objects(@ids) ) {
-    printf("Updating objectset\n");
-        $ObjectSet->set("NAME", "test01");
-
-        $ds->put_objects($ObjectSet);
-    }
-
-    my $o = Warewulf::Object->new();
-    $o->set("FOO", "BAR");
-    $o->set("NAME", "Test Object");
-
-    $ds->put_objects($o);
-
-    $ds->persist("/tmp/wwtest.json");
 
 
 
