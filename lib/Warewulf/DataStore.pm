@@ -42,18 +42,16 @@ Warewulf::DataStore - Warewulf's data storage class
     $ds->open("/tmp/wwtest.json");
 
     my @ids = $ds->find();
+    my $newid = $ds->create_new();
 
-    foreach my $id ( @ids ) {
+    $ds->set_value($newid, "NAME", sprintf("n%04.4s", (scalar @ids) + 1));
+
+    foreach my $id ( $ds->find()) {
         my $value = $ds->get_value($id, "NAME");
         if ( $value ) {
             print("$id: $value\n");
         }
     }
-
-    my $id = `cat /proc/sys/kernel/random/uuid`;
-    chomp($id);
-
-    $ds->set_value($id, "NAME", sprintf("n%04.4s", (scalar @ids) + 1));
 
     $ds->commit();
 
@@ -200,11 +198,41 @@ set_value($$$)
     my $count = 0;
 
     if ( exists($self->{"DATA"}) ) {
-        $self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{$id}{$key} = $value;
-        $count++;
+        if ( exists($self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{$id}) ) {
+            $self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{$id}{$key} = $value;
+            $count++;
+        }
     }
 
     return($count);
+}
+
+
+=item create_new()
+
+Create a new object and return the new ID string.
+
+=cut
+
+sub
+create_new($$$)
+{
+    my ($self) = @_;
+    my $id, $fd;
+
+    open($fd, "/proc/sys/kernel/random/uuid");
+    $id = <$fd>;
+    close($fd);
+    chomp($id);
+
+    if ( exists($self->{"DATA"}) ) {
+        if ( exists($self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{$id}) ) {
+            return(undef);
+        }
+        $self->{"DATA"}{"WAREWULF"}{"OBJECTS"}{$id}{"ID"} = $id;
+    }
+
+    return($id);
 }
 
 
@@ -334,7 +362,6 @@ put_objects($$)
 Warewulf::Object Warewulf::ObjectSet
 
 =cut
-
 
 
 
