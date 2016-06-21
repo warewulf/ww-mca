@@ -33,7 +33,7 @@
 #include "src/util/output.h"
 #include "src/mca/mca.h"
 #include "src/mca/base/base.h"
-#include "Warewulf/ww_common.h"
+#include "ww_types.h"
 
 /*
  * Local functions

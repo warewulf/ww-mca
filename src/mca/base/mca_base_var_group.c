@@ -38,7 +38,7 @@
 #include "src/util/show_help.h"
 #include "src/mca/mca.h"
 #include "src/mca/base/mca_base_vari.h"
-#include "Warewulf/ww_common.h"
+#include "ww_types.h"
 #include "src/util/output.h"
 #include "src/util/ww_environ.h"
 

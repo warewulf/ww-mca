@@ -1,0 +1,11 @@
+# -*- text -*-
+#
+# Copyright (c) 2016      Intel, Inc.  All rights reserved.
+# $COPYRIGHT$
+#
+# Additional copyrights may follow
+#
+# $HEADER$
+#
+# This is the US/English general help file for Warewulf's submanager.
+#

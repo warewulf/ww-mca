@@ -27,7 +27,7 @@
 #include <src/include/ww_config.h>
 
 #include "src/class/ww_object.h"
-#include "Warewulf/ww_common.h"
+#include "ww_types.h"
 
 typedef struct mca_base_var_enum_t mca_base_var_enum_t;
 

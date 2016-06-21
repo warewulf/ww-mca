@@ -13,7 +13,7 @@
 
 #include <src/include/ww_config.h>
 
-#include "Warewulf/ww_common.h"
+#include "ww_types.h"
 #include "src/util/output.h"
 
 #include "mca_base_framework.h"

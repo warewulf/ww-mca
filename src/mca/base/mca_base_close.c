@@ -27,7 +27,7 @@
 #include "src/mca/mca.h"
 #include "src/mca/base/base.h"
 #include "src/mca/base/mca_base_component_repository.h"
-#include "Warewulf/ww_common.h"
+#include "ww_types.h"
 
 extern int mca_base_opened;
 

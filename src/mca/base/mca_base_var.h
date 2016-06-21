@@ -733,6 +733,13 @@ WW_DECLSPEC int mca_base_var_dump(int vari, char ***out, mca_base_var_dump_type_
 WW_DECLSPEC int mca_base_var_process_env_list(char ***argv);
 WW_DECLSPEC int mca_base_var_process_env_list_from_file(char ***argv);
 
+/*
+ * Initialize any file-based params
+ */
+WW_DECLSPEC int mca_base_var_cache_files(bool rel_path_search);
+
+
+
 END_C_DECLS
 
 #endif /* WW_MCA_BASE_VAR_H */

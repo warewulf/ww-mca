@@ -25,6 +25,8 @@ Makefile.in
 static-components.h
 config.*
 src/config.h*
+src/include/ww_config.h
+src/include/ww_config.h.in
 Makefile
 Makefile.in
 aclocal.m4
@@ -53,4 +55,10 @@ config/ltsugar.m4
 config/ltversion.m4
 config/lt~obsolete.m4
 config/autogen_found_items.m4
+config/ylwrap
+src/util/keyval/keyval_lex.c
+src/util/show_help_lex.c
 
+src/mca/installdirs/config/install_dirs.h
+
+src/tools/submanager/submanager
