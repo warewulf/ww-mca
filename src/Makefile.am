@@ -12,6 +12,7 @@
 ACLOCAL_AMFLAGS = -I ./config
 
 SUBDIRS = \
+	util/keyval \
 	mca/base \
 	$(MCA_ww_FRAMEWORKS_SUBDIRS) \
 	$(MCA_ww_FRAMEWORK_COMPONENT_STATIC_SUBDIRS) \

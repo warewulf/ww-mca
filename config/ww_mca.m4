@@ -702,7 +702,7 @@ AC_DEFUN([MCA_PROCESS_COMPONENT],[
     infile="$srcdir/src/mca/$1/$2/post_configure.sh"
 
     # Add this subdir to the mast list of all MCA component subdirs
-    $4="$$3 $2"
+    $3="$$3 $2"
 
     if test "$7" = "dso" ; then
         $5="$$5 $2"
