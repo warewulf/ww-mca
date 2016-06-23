@@ -38,7 +38,7 @@
 #include "src/mca/mca.h"
 #include "src/mca/base/base.h"
 #include "src/mca/base/mca_base_component_repository.h"
-#include "Warewulf/ww_common.h"
+#include "ww_types.h"
 #include "src/util/ww_environ.h"
 
 /*
@@ -76,10 +76,10 @@ int mca_base_open(void)
 
     /* define the system and user default paths */
 #if WW_WANT_HOME_CONFIG_FILES
-    mca_base_system_default_path = strdup(ww_install_dirs.Warewulflibdir);
+    mca_base_system_default_path = strdup(ww_install_dirs.wwlibdir);
     asprintf(&mca_base_user_default_path, "%s"WW_PATH_SEP".openmpi"WW_PATH_SEP"components", ww_home_directory());
 #else
-    asprintf(&mca_base_system_default_path, "%s", ww_install_dirs.Warewulflibdir);
+    asprintf(&mca_base_system_default_path, "%s", ww_install_dirs.wwlibdir);
 #endif
 
     /* see if the user wants to override the defaults */

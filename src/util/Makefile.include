@@ -1,0 +1,67 @@
+# -*- makefile -*-
+#
+# Copyright (c) 2004-2005 The Trustees of Indiana University and Indiana
+#                         University Research and Technology
+#                         Corporation.  All rights reserved.
+# Copyright (c) 2004-2005 The University of Tennessee and The University
+#                         of Tennessee Research Foundation.  All rights
+#                         reserved.
+# Copyright (c) 2004-2005 High Performance Computing Center Stuttgart,
+#                         University of Stuttgart.  All rights reserved.
+# Copyright (c) 2004-2005 The Regents of the University of California.
+#                         All rights reserved.
+# Copyright (c) 2007-2016 Cisco Systems, Inc.  All rights reserved.
+# Copyright (c) 2013      NVIDIA Corporation.  All rights reserved.
+# Copyright (c) 2013-2016 Intel, Inc. All rights reserved
+# $COPYRIGHT$
+#
+# Additional copyrights may follow
+#
+# $HEADER$
+#
+
+SUBDIRS += util/keyval
+
+AM_LFLAGS = -Pww_show_help_yy
+LEX_OUTPUT_ROOT = lex.ww_show_help_yy
+
+# Source code files
+
+headers += \
+        util/argv.h \
+        util/error.h \
+        util/printf.h \
+        util/output.h \
+        util/ww_environ.h \
+        util/crc.h \
+        util/fd.h \
+        util/timings.h \
+        util/os_path.h \
+        util/basename.h \
+        util/hash.h \
+        util/keyval_parse.h \
+        util/show_help.h \
+        util/show_help_lex.h \
+        util/path.h
+
+libww_la_SOURCES += \
+        util/argv.c \
+        util/error.c \
+        util/printf.c \
+        util/output.c \
+        util/ww_environ.c \
+        util/crc.c \
+        util/fd.c \
+        util/timings.c \
+        util/os_path.c \
+        util/basename.c \
+        util/hash.c \
+        util/show_help_lex.l \
+        util/keyval_parse.c \
+        util/show_help.c \
+        util/path.c
+
+libww_la_LIBADD += \
+        util/keyval/libwwutilkeyval.la
+libww_la_DEPENDENCIES += \
+        util/keyval/libwwutilkeyval.la

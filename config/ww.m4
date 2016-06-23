@@ -121,7 +121,7 @@ AC_DEFUN([WW_SETUP_CORE],[
     AC_MSG_RESULT(m4_ifval([$1], ww_config_prefix, [(none)]))
 
     # Configure the header file
-    AC_CONFIG_HEADERS(ww_config_prefix[include/warewulf/autogen/config.h])
+    AC_CONFIG_HEADERS(ww_config_prefix[src/include/ww_config.h])
 
     # GCC specifics.
     if test "x$GCC" = "xyes"; then
@@ -448,6 +448,34 @@ AC_DEFUN([WW_SETUP_CORE],[
     AC_MSG_RESULT([$ww_ptrdiff_t (size: $ww_ptrdiff_size)])
 
     ##################################
+    # Linker characteristics
+    ##################################
+
+    AC_MSG_CHECKING([the linker for support for the -fini option])
+    WW_VAR_SCOPE_PUSH([LDFLAGS_save])
+    LDFLAGS_save=$LDFLAGS
+    LDFLAGS="$LDFLAGS_save -Wl,-fini -Wl,finalize"
+    AC_TRY_LINK([void finalize (void) {}], [], [AC_MSG_RESULT([yes])
+            ww_ld_have_fini=1], [AC_MSG_RESULT([no])
+            ww_ld_have_fini=0])
+    LDFLAGS=$LDFLAGS_save
+    WW_VAR_SCOPE_POP
+
+    ww_destructor_use_fini=0
+    ww_no_destructor=0
+    if test x$ww_cv___attribute__destructor = x0 ; then
+        if test x$ww_ld_have_fini = x1 ; then
+            ww_destructor_use_fini=1
+        else
+            ww_no_destructor=1;
+        fi
+    fi
+
+    AC_DEFINE_UNQUOTED(WW_NO_LIB_DESTRUCTOR, [$ww_no_destructor],
+        [Whether libraries can be configured with destructor functions])
+    AM_CONDITIONAL(WW_DESTRUCTOR_USE_FINI, [test x$ww_destructor_use_fini = x1])
+
+    ##################################
     # Libraries
     ##################################
 
@@ -592,6 +620,7 @@ AC_DEFUN([WW_SETUP_CORE],[
         ww_config_prefix[config/Makefile]
         ww_config_prefix[include/Makefile]
         ww_config_prefix[src/Makefile]
+        ww_config_prefix[src/util/keyval/Makefile]
         ww_config_prefix[src/mca/base/Makefile]
         warewulf.spec
         bin/Makefile
@@ -599,6 +628,7 @@ AC_DEFUN([WW_SETUP_CORE],[
         lib/Makefile
         lib/Warewulf/ACVars.pm
         lib/Warewulf/Makefile
+        ww_config_prefix[src/tools/submanager/Makefile]
         )
 
     # Success
@@ -743,5 +773,23 @@ with_ident_string="`eval echo $with_ident_string`"
 AC_DEFINE_UNQUOTED([WW_IDENT_STRING], ["$with_ident_string"],
                    [ident string for Warewulf])
 AC_MSG_RESULT([$with_ident_string])
+
+#
+# Timing support
+#
+AC_MSG_CHECKING([if want developer-level timing support])
+AC_ARG_ENABLE(timing,
+              AC_HELP_STRING([--enable-timing],
+                             [enable developer-level timing code (default: disabled)]))
+if test "$enable_timing" = "yes"; then
+    AC_MSG_RESULT([yes])
+    WANT_TIMING=1
+else
+    AC_MSG_RESULT([no])
+    WANT_TIMING=0
+fi
+
+AC_DEFINE_UNQUOTED([WW_ENABLE_TIMING], [$WANT_TIMING],
+                   [Whether we want developer-level timing support or not])
 
 ])dnl

@@ -45,7 +45,7 @@
 #include "src/util/argv.h"
 #include "src/mca/mca.h"
 #include "src/mca/base/mca_base_vari.h"
-#include "Warewulf/ww_common.h"
+#include "ww_types.h"
 #include "src/util/output.h"
 #include "src/util/ww_environ.h"
 
@@ -129,7 +129,6 @@ static const char *info_lvl_strings[] = {
  */
 static int fixup_files(char **file_list, char * path, bool rel_path_search, char sep);
 static int read_files (char *file_list, ww_list_t *file_values, char sep);
-static int mca_base_var_cache_files (bool rel_path_search);
 static int var_set_initial (mca_base_var_t *var, mca_base_var_t *original);
 static int var_get (int vari, mca_base_var_t **var_out, bool original);
 static int var_value_string (mca_base_var_t *var, char **value_string);
@@ -411,7 +410,7 @@ static void resolve_relative_paths(char **file_prefix, char *file_path, bool rel
     }
 }
 
-static int mca_base_var_cache_files(bool rel_path_search)
+int mca_base_var_cache_files(bool rel_path_search)
 {
     char *tmp;
     int ret;
@@ -508,7 +507,7 @@ static int mca_base_var_cache_files(bool rel_path_search)
     }
 
     ret = asprintf(&mca_base_param_file_path, "%s" WW_PATH_SEP "amca-param-sets%c%s",
-                   ww_install_dirs.Warewulfdatadir, WW_ENV_SEP, cwd);
+                   ww_install_dirs.wwdatadir, WW_ENV_SEP, cwd);
     if (0 > ret) {
         return WW_ERR_OUT_OF_RESOURCE;
     }

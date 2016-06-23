@@ -40,7 +40,7 @@
 #include "src/mca/base/base.h"
 #include "src/mca/base/mca_base_component_repository.h"
 #include "src/mca/dl/base/base.h"
-#include "Warewulf/ww_common.h"
+#include "ww_types.h"
 #include "src/class/ww_hash_table.h"
 #include "src/util/basename.h"
 
