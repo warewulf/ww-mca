@@ -52,20 +52,22 @@ AM_SILENT_RULES([yes])
 AC_LANG([C])
 AC_PATH_PROG(PERLBIN, perl)
 if test -z "$PERLBIN"; then
-   AC_MSG_ERROR([perl not found])
+    AC_MSG_ERROR([perl not found])
 fi
 AC_SUBST(PERLBIN)
 
-AC_MSG_CHECKING(for Perl vendor lib path)
-eval `perl -V:installvendorlib`
-WW_PERL_VENDORLIB=$installvendorlib
-AC_ARG_WITH(perllibdir, [  --with-perllibdir=path  Manually specify where the perl modules should go], [
-if test -n "$withval" -a "x$withval" != "xno" ; then
-   WW_PERL_VENDORLIB=$withval
+AC_MSG_CHECKING(for Perl lib location)
+WW_PERLLIBDIR="$prefix/lib/"
+AC_ARG_WITH(perllibdir, [  --perllibdir=path       Path to install Perl libraries ('auto' uses standard perl location)], [
+if test -n "$withval" -a "$withval" == "auto" ; then
+    eval `perl -V:installvendorlib`
+    WW_PERLLIBDIR=$installvendorlib
+elif test -n "$withval" -a "$withval" != "no" ; then
+    WW_PERLLIBDIR=$withval
 fi
 ])
-AC_MSG_RESULT($WW_PERL_VENDORLIB)
-AC_SUBST(WW_PERL_VENDORLIB)
+AC_MSG_RESULT($WW_PERLLIBDIR)
+AC_SUBST(WW_PERLLIBDIR)
 
 
 # AC_USE_SYSTEM_EXTENSIONS will modify CFLAGS if nothing was in there

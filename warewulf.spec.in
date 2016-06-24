@@ -39,7 +39,7 @@ It's the future of computing. People will bow to it.
 
 
 %build
-%configure
+%configure --with-perllibdir=%{perl_vendorlib}
 %{__make} %{?mflags}
 
 
