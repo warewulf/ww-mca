@@ -24,7 +24,7 @@
  * $HEADER$
  */
 
-#include <src/include/private/autogen/config.h>
+#include <src/include/ww_config.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -55,7 +55,7 @@
 #include "src/mca/mca.h"
 #include "src/mca/base/base.h"
 #include "src/mca/base/mca_base_component_repository.h"
-#include "Warewulf/ww_common.h"
+#include "ww_types.h"
 #include "src/mca/dl/base/base.h"
 
 #if WW_HAVE_DL_SUPPORT

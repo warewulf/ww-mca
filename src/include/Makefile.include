@@ -1,0 +1,22 @@
+# -*- makefile -*-
+#
+# Copyright (c) 2016      Intel, Inc.  All rights reserved.
+# $COPYRIGHT$
+#
+# Additional copyrights may follow
+#
+# $HEADER$
+#
+
+# This makefile.am does not stand on its own - it is included from
+# Makefile.am
+
+# Source code files
+nodist_headers += \
+        include/ww_config_top.h \
+        include/ww_config_bottom.h \
+        include/align.h \
+        include/hash_string.h \
+        include/prefecth.h \
+        include/ww_socket_errno.h \
+        include/ww.stdint.h

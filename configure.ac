@@ -77,7 +77,7 @@ WW_VAR_SCOPE_PUSH([CFLAGS_save])
 CFLAGS_save=$CFLAGS
 AC_USE_SYSTEM_EXTENSIONS
 AS_IF([test -z "$CFLAGS_save"], [CFLAGS=])
-ww_VAR_SCOPE_POP
+WW_VAR_SCOPE_POP
 
 ####################################################################
 # Setup the configure header files
@@ -99,11 +99,11 @@ AH_TOP([/* -*- c -*-
 #ifndef WW_CONFIG_H
 #define WW_CONFIG_H
 
-#include <warewulf/autogen/ww_config_top.h>
+#include <src/include/ww_config_top.h>
 
 ])
 AH_BOTTOM([
-#include <ww/autogen/ww_config_bottom.h>
+#include <src/include/ww_config_bottom.h>
 #endif /* WW_CONFIG_H */
 ])
 
@@ -133,6 +133,7 @@ AM_DISABLE_STATIC
 # This did not exist pre AM 1.11.x (where x is somewhere >0 and <3),
 # but it is necessary in AM 1.12.x.
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+AM_PROG_LEX
 
 LT_INIT()
 LT_LANG([C])

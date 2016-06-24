@@ -1,3 +1,12 @@
+#
+# Copyright (c) 2016      Intel, Inc. All rights reserved
+# $COPYRIGHT$
+#
+# Additional copyrights may follow
+#
+# $HEADER$
+#
+
 # Note that the -I directory must *exactly* match what was specified
 # via AC_CONFIG_MACRO_DIR in configure.ac.
 ACLOCAL_AMFLAGS = -I ./config
@@ -29,8 +38,8 @@ test-verbose:
 	$(MAKE) test TESTVERBOSE=1
 
 nroff:
-    (cd man; $(MAKE) nroff)
+	(cd man; $(MAKE) nroff)
 
 dist-hook:
-    env LS_COLORS= sh "$(top_srcdir)/config/distscript.sh" "$(top_srcdir)" "$(distdir)" "$(WW_VERSION)" "$(WW_REPO_REV)"
+	env LS_COLORS= sh "$(top_srcdir)/config/distscript.sh" "$(top_srcdir)" "$(distdir)" "$(WW_VERSION)" "$(WW_REPO_REV)"
 
