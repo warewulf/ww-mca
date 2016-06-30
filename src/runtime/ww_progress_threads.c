@@ -19,47 +19,11 @@
 #include WW_EVENT_HEADER
 
 #include "src/class/ww_list.h"
+#include "src/threads/threads.h"
 #include "src/util/error.h"
 #include "src/util/fd.h"
 
 #include "src/runtime/ww_progress_threads.h"
-
-/* define a thread object */
-#define WW_THREAD_CANCELLED   ((void*)1);
-typedef void *(*ww_thread_fn_t) (ww_object_t *);
-
-typedef struct ww_thread_t {
-    ww_object_t super;
-    ww_thread_fn_t t_run;
-    void* t_arg;
-    pthread_t t_handle;
-} ww_thread_t;
-WW_CLASS_INSTANCE(ww_thread_t,
-                  ww_object_t,
-                  NULL, NULL);
-
-static int ww_thread_start(ww_thread_t *t)
-{
-    int rc;
-
-    if (WW_ENABLE_DEBUG) {
-        if (NULL == t->t_run || t->t_handle != (pthread_t) -1) {
-            return WW_ERR_BAD_PARAM;
-        }
-    }
-
-    rc = pthread_create(&t->t_handle, NULL, (void*(*)(void*)) t->t_run, t);
-
-    return (rc == 0) ? WW_SUCCESS : WW_ERROR;
-}
-
-
-static int ww_thread_join(ww_thread_t *t, void **thr_return)
-{
-    int rc = pthread_join(t->t_handle, thr_return);
-    t->t_handle = (pthread_t) -1;
-    return (rc == 0) ? WW_SUCCESS : WW_ERROR;
-}
 
 
 /* create a tracking object for progress threads */

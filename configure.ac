@@ -160,37 +160,6 @@ WW_SETUP_CORE
 
 
 ####################################################################
-# Setup C compiler
-####################################################################
-
-CFLAGS_save="$CFLAGS"
-AC_PROG_CC
-CFLAGS="$CFLAGS_save"
-
-AC_ARG_VAR(CC_FOR_BUILD,[build system C compiler])
-AS_IF([test -z "$CC_FOR_BUILD"],[
-    AC_SUBST([CC_FOR_BUILD], [$CC])
-])
-
-WW_SETUP_CC
-
-#
-# Delayed the substitution of CFLAGS and CXXFLAGS until now because
-# they may have been modified throughout the course of this script.
-#
-
-AC_SUBST(CFLAGS)
-AC_SUBST(CPPFLAGS)
-
-ww_show_title "Final compiler flags"
-
-AC_MSG_CHECKING([final CPPFLAGS])
-AC_MSG_RESULT([$CPPFLAGS])
-
-AC_MSG_CHECKING([final CFLAGS])
-AC_MSG_RESULT([$CFLAGS])
-
-####################################################################
 # Version information
 ####################################################################
 

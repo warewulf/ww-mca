@@ -79,6 +79,8 @@ AC_DEFUN([WW_SETUP_CORE],[
     fi
     AC_MSG_RESULT([$WW_VERSION])
     AC_SUBST(WW_VERSION)
+    AC_DEFINE_UNQUOTED([WW_VERSION], ["$WW_VERSION"],
+                       [The library version is always available, contrary to VERSION])
 
     WW_MAJOR_VERSION="`$WW_top_srcdir/config/ww_get_version.sh $WW_top_srcdir/VERSION --major`"
     if test "$?" != "0"; then
@@ -129,6 +131,37 @@ AC_DEFUN([WW_SETUP_CORE],[
         WW_GCC_CFLAGS="$WW_GCC_CFLAGS -Wpointer-arith -Wcast-align"
     fi
 
+    ####################################################################
+    # Setup C compiler
+    ####################################################################
+
+    CFLAGS_save="$CFLAGS"
+    AC_PROG_CC
+    CFLAGS="$CFLAGS_save"
+
+    AC_ARG_VAR(CC_FOR_BUILD,[build system C compiler])
+    AS_IF([test -z "$CC_FOR_BUILD"],[
+        AC_SUBST([CC_FOR_BUILD], [$CC])
+    ])
+
+    WW_SETUP_CC
+
+    #
+    # Delayed the substitution of CFLAGS and CXXFLAGS until now because
+    # they may have been modified throughout the course of this script.
+    #
+
+    AC_SUBST(CFLAGS)
+    AC_SUBST(CPPFLAGS)
+
+    ww_show_title "Final compiler flags"
+
+    AC_MSG_CHECKING([final CPPFLAGS])
+    AC_MSG_RESULT([$CPPFLAGS])
+
+    AC_MSG_CHECKING([final CFLAGS])
+    AC_MSG_RESULT([$CFLAGS])
+
     ############################################################################
     # Check for compilers and preprocessors
     ############################################################################
@@ -147,7 +180,8 @@ AC_DEFUN([WW_SETUP_CORE],[
     AC_CHECK_TYPES(int64_t)
     AC_CHECK_TYPES(uint64_t)
     AC_CHECK_TYPES(long long)
-
+    AC_CHECK_TYPES(int128_t)
+    AC_CHECK_TYPES(uint128_t)
     AC_CHECK_TYPES(intptr_t)
     AC_CHECK_TYPES(uintptr_t)
     AC_CHECK_TYPES(ptrdiff_t)
@@ -203,6 +237,9 @@ AC_DEFUN([WW_SETUP_CORE],[
     fi
     WW_C_GET_ALIGNMENT(void *, WW_ALIGNMENT_VOID_P)
     WW_C_GET_ALIGNMENT(size_t, WW_ALIGNMENT_SIZE_T)
+    if test "$ac_cv_type_int128_t" = yes; then
+        WW_C_GET_ALIGNMENT(int128_t, WW_ALIGNMENT_INT128)
+    fi
 
 
     #
@@ -270,6 +307,16 @@ AC_DEFUN([WW_SETUP_CORE],[
     WW_CHECK_COMPILER_VERSION_ID
 
     ##################################
+    # Assembler Configuration
+    ##################################
+
+    ww_show_subtitle "Assembler"
+
+    AM_PROG_AS
+    WW_CONFIG_ASM
+
+
+    ##################################
     # Header files
     ##################################
 
@@ -278,6 +325,7 @@ AC_DEFUN([WW_SETUP_CORE],[
     AC_CHECK_HEADERS([arpa/inet.h \
                       fcntl.h inttypes.h libgen.h \
                       netinet/in.h \
+                      pthread.h \
                       stdint.h stddef.h \
                       stdlib.h string.h strings.h \
                       sys/param.h \
@@ -543,6 +591,19 @@ AC_DEFUN([WW_SETUP_CORE],[
 
     AC_C_BIGENDIAN
     WW_CHECK_BROKEN_QSORT
+
+    #
+    # Check out what thread support we have
+    #
+    WW_CONFIG_THREADS
+
+    CFLAGS="$CFLAGS $THREAD_CFLAGS"
+    CPPFLAGS="$CPPFLAGS $THREAD_CPPFLAGS"
+    CXXFLAGS="$CXXFLAGS $THREAD_CXXFLAGS"
+    CXXCPPFLAGS="$CXXCPPFLAGS $THREAD_CXXCPPFLAGS"
+    LDFLAGS="$LDFLAGS $THREAD_LDFLAGS"
+    LIBS="$LIBS $THREAD_LIBS"
+
 
     ##################################
     # Visibility

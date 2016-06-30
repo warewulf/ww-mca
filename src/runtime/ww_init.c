@@ -38,7 +38,7 @@
 #include "src/mca/base/base.h"
 #include "src/mca/base/mca_base_var.h"
 #include "src/mca/installdirs/base/base.h"
-#include "src/mca/bfrops/base/base.h"
+#include "src/mca/dstore/base/base.h"
 #include "src/mca/sec/base/base.h"
 
 #include "ww_types.h"
@@ -137,20 +137,13 @@ int ww_init(int* pargc, char*** pargv)
         goto return_error;
     }
 
-    /* initialize the bfrops framework */
-    if( WW_SUCCESS != (ret = mca_base_framework_open(&ww_bfrops_base_framework, 0)) ) {
-        error = "ww_bfrops_base_open";
+    /* initialize the dstore framework */
+    if( WW_SUCCESS != (ret = mca_base_framework_open(&ww_dstore_base_framework, 0)) ) {
+        error = "ww_dstore_base_open";
         goto return_error;
     }
-    if( WW_SUCCESS != (ret = ww_bfrop_base_select()) ) {
-        error = "ww_bfrops_base_select";
-        goto return_error;
-    }
-
-    /* create an event base and progress thread for us */
-    if (NULL == (ww_globals.evbase = ww_progress_thread_init(NULL))) {
-        error = "progress thread";
-        ret = WW_ERROR;
+    if( WW_SUCCESS != (ret = ww_dstore_base_select()) ) {
+        error = "ww_dstore_base_select";
         goto return_error;
     }
 

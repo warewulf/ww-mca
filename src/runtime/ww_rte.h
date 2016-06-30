@@ -34,26 +34,16 @@
 #include WW_EVENT_HEADER
 
 #include "src/util/printf.h"
-#include "src/mca/bfrops/bfrops.h"
 BEGIN_C_DECLS
 
 /** version string of ww */
 WW_DECLSPEC extern const char ww_version_string[];
-
-/* object for tracking the communication-related characteristics
- * of a given peer */
-typedef struct ww_peer_comm_t {
-    ww_bfrop_buffer_type_t type;
-    ww_bfrops_module_t *bfrops;
-//    ww_sec_base_module_t *sec;
-} ww_peer_comm_t;
 
 /* define a peer object */
 typedef struct ww_peer_t {
     ww_object_t super;
     uid_t uid;
     gid_t gid;
-    ww_peer_comm_t comm;
 } ww_peer_t;
 WW_CLASS_DECLARATION(ww_peer_t);
 

@@ -99,8 +99,8 @@ while ($pandoc_input =~ m/\[(.+?)\]\(.+?\)/) {
 }
 
 # Add the pandoc header
-$pandoc_input = "% $shortfile($section) PMIx Programmer's Manual | \@VERSION\@
-% PMIx
+$pandoc_input = "% $shortfile($section) Warewulf Programmer's Manual | \@VERSION\@
+% Warewulf
 % \@DATE\@\n\n$pandoc_input";
 
 # Generate the nroff output

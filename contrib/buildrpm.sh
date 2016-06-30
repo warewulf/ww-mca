@@ -78,7 +78,7 @@ fi
 first="`basename $tarball | cut -d- -f2`"
 version="`echo $first | sed -e 's/\.tar\.'$extension'//'`"
 unset first
-echo "--> Found PMIx version: $version"
+echo "--> Found Warewulf version: $version"
 
 #
 # do we have the spec files?
@@ -212,7 +212,7 @@ fi
 #
 
 if test "$build_srpm" = "yes"; then
-    echo "--> Building the PMIx SRPM"
+    echo "--> Building the Warewulf SRPM"
     rpmbuild_options="$rpmbuild_options --define 'dist %{nil}'"
     cmd="$rpm_cmd $rpmbuild_options -bs $specdest"
     echo "--> $cmd"
@@ -231,7 +231,7 @@ fi
 #
 
 if test "$build_single" = "yes"; then
-    echo "--> Building the single PMIx RPM"
+    echo "--> Building the single Warewulf RPM"
     cmd="$rpm_cmd -bb $rpmbuild_options --define 'build_all_in_one_rpm 1'"
     if test "$configure_options" != ""; then
         cmd="$cmd --define 'configure_options $configure_options'"
@@ -253,7 +253,7 @@ fi
 #
 
 if test "$build_multiple" = "yes"; then
-    echo "--> Building the multiple PMIx RPM"
+    echo "--> Building the multiple Warewulf RPM"
     cmd="$rpm_cmd -bb $rpmbuild_options --define 'build_all_in_one_rpm 0'"
     if test "$configure_options" != ""; then
         cmd="$cmd --define 'configure_options $configure_options'"
@@ -277,7 +277,7 @@ fi
 cat <<EOF
 
 ------------------------------------------------------------------------------
-====                FINISHED BUILDING PMIx RPM                        ====
+====                FINISHED BUILDING Warewulf RPM                        ====
 ------------------------------------------------------------------------------
 A copy of the tarball is located in: $rpmtopdir/SOURCES/
 The completed rpms are located in:   $rpmtopdir/RPMS/i<something>86/

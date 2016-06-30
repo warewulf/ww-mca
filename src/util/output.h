@@ -42,8 +42,8 @@
  * WARNING: When using "file" as an output destination, be aware that
  * the file may not exist until the session directory for the process
  * exists.  This is at least part of the way through MPI_INIT (for
- * example).  Most MCA components and internals of PMIx won't be
- * affected by this, but some RTE / startup aspects of PMIx will
+ * example).  Most MCA components and internals of Warewulf won't be
+ * affected by this, but some RTE / startup aspects of Warewulf will
  * not be able to write to a file for output.  See ww_output() for
  * details on what happens in these cases.
  *

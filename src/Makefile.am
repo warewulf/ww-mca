@@ -47,8 +47,10 @@ include class/Makefile.include
 include include/Makefile.include
 include mca/Makefile.include
 include util/Makefile.include
-include tools/Makefile.am
-include runtime/Makefile.am
+include tools/Makefile.include
+include runtime/Makefile.include
+include sys/Makefile.include
+include threads/Makefile.include
 
 MAINTAINERCLEANFILES = Makefile.in config.h config.h.in
 DISTCLEANFILES = Makefile

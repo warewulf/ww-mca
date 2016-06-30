@@ -7,15 +7,15 @@
 #include <Warewulf/mca/base/mca_base_framework.h>
 
 extern mca_base_framework_t ww_src_base_framework;
-extern mca_base_framework_t ww_bfrops_base_framework;
 extern mca_base_framework_t ww_dl_base_framework;
+extern mca_base_framework_t ww_dstore_base_framework;
 extern mca_base_framework_t ww_installdirs_base_framework;
 extern mca_base_framework_t ww_sec_base_framework;
 
 static mca_base_framework_t *ww_frameworks[] = {
     &ww_src_base_framework,
-    &ww_bfrops_base_framework,
     &ww_dl_base_framework,
+    &ww_dstore_base_framework,
     &ww_installdirs_base_framework,
     &ww_sec_base_framework,
     NULL

@@ -14,7 +14,7 @@
 /**
  * @file
  *
- * This interface is for security support. PMIx doesn't need much in
+ * This interface is for security support. Warewulf doesn't need much in
  * this regard, but we do need a mechanism for authenticating connections.
  *
  * Only *one* plugin will be active in a client, but multiple plugins may

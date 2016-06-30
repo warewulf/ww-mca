@@ -12,7 +12,6 @@
 #                         University of Stuttgart.  All rights reserved.
 # Copyright (c) 2004-2005 The Regents of the University of California.
 #                         All rights reserved.
-# Copyright (c) 2010 Cisco Systems, Inc.  All rights reserved.
 # Copyright (c) 2010      Oracle and/or its affiliates.  All rights
 #                         reserved.
 # $COPYRIGHT$
@@ -41,7 +40,8 @@ EXTRA_DIST = \
 	ww_search_libs.m4 \
 	ww_setup_cc.m4 \
 	ww_setup_hwloc.m4 \
-	ww_setup_libevent.m4
+	ww_setup_libevent.m4 \
+	ww_try_assemble.m4
 
 
 maintainer-clean-local:

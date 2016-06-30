@@ -38,7 +38,6 @@ headers += \
         util/timings.h \
         util/os_path.h \
         util/basename.h \
-        util/hash.h \
         util/keyval_parse.h \
         util/show_help.h \
         util/show_help_lex.h \
@@ -55,7 +54,6 @@ libww_la_SOURCES += \
         util/timings.c \
         util/os_path.c \
         util/basename.c \
-        util/hash.c \
         util/show_help_lex.l \
         util/keyval_parse.c \
         util/show_help.c \

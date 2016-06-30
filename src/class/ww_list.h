@@ -13,7 +13,7 @@
  * Copyright (c) 2007      Voltaire All rights reserved.
  * Copyright (c) 2013      Los Alamos National Security, LLC. All rights
  *                         reserved.
- * Copyright (c) 2013-2015 Intel, Inc. All rights reserved
+ * Copyright (c) 2013-2016 Intel, Inc. All rights reserved
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -24,7 +24,7 @@
  * @file
  *
  * The ww_list_t interface is used to provide a generic
- * doubly-linked list container for PMIx.  It was inspired by (but
+ * doubly-linked list container for WW.  It was inspired by (but
  * is slightly different than) the Standard Template Library (STL)
  * std::list class.  One notable difference from std::list is that
  * when an ww_list_t is destroyed, all of the ww_list_item_t
@@ -75,6 +75,7 @@
 #endif
 
 #include "src/class/ww_object.h"
+#include "src/threads/threads.h"
 
 BEGIN_C_DECLS
 
@@ -100,7 +101,7 @@ WW_DECLSPEC WW_CLASS_DECLARATION(ww_list_item_t);
 struct ww_list_item_t
 {
     ww_object_t super;
-    /**< Generic parent class for all PMIx objects */
+    /**< Generic parent class for all WW objects */
     volatile struct ww_list_item_t *ww_list_next;
     /**< Pointer to next list item */
     volatile struct ww_list_item_t *ww_list_prev;
@@ -148,12 +149,10 @@ typedef struct ww_list_item_t ww_list_item_t;
  */
 struct ww_list_t
 {
-    ww_object_t       super;
-    /**< Generic parent class for all PMIx objects */
-    ww_list_item_t    ww_list_sentinel;
-    /**< Head and tail item of the list */
-    volatile size_t     ww_list_length;
-    /**< Quick reference to the number of items in the list */
+    ww_object_t       super; // Generic parent class for all WW objects
+    ww_list_item_t    ww_list_sentinel; // Head and tail item of the list
+    volatile size_t     ww_list_length; // Quick reference to the number of items in the list
+    ww_threadlock_t lock;      // thread support
 };
 /**
  * List container type.
@@ -168,22 +167,22 @@ typedef struct ww_list_t ww_list_t;
  *
  * @param[in] list List to destruct or release
  */
-#define WW_LIST_DESTRUCT(list)                                \
-    do {                                                        \
-        ww_list_item_t *it;                                   \
-        while (NULL != (it = ww_list_remove_first(list))) {   \
-            WW_RELEASE(it);                                    \
-        }                                                       \
-        WW_DESTRUCT(list);                                     \
+#define WW_LIST_DESTRUCT(list)                                              \
+    do {                                                                    \
+        ww_list_item_t *it;                                                 \
+        while (NULL != (it = ww_list_remove_first(list))) {                 \
+            WW_RELEASE(it);                                                 \
+        }                                                                   \
+        WW_DESTRUCT(list);                                                  \
     } while (0)
 
-#define WW_LIST_RELEASE(list)                                 \
-    do {                                                        \
-        ww_list_item_t *it;                                   \
-        while (NULL != (it = ww_list_remove_first(list))) {   \
-            WW_RELEASE(it);                                    \
-        }                                                       \
-        WW_RELEASE(list);                                      \
+#define WW_LIST_RELEASE(list)                                               \
+    do {                                                                    \
+        ww_list_item_t *it;                                                 \
+        while (NULL != (it = ww_list_remove_first(list))) {                 \
+            WW_RELEASE(it);                                                 \
+        }                                                                   \
+        WW_RELEASE(list);                                                   \
     } while (0)
 
 
@@ -200,13 +199,15 @@ typedef struct ww_list_t ww_list_t;
  * Example Usage:
  *
  * class_foo_t *foo;
+ * WW_ACQUIRE_THREAD(&list->lock);
  * ww_list_foreach(foo, list, class_foo_t) {
  *    do something;
  * }
+ * WW_RELEASE_THREAD(&list->lock);
  */
-#define WW_LIST_FOREACH(item, list, type)                             \
-  for (item = (type *) (list)->ww_list_sentinel.ww_list_next ;      \
-       item != (type *) &(list)->ww_list_sentinel ;                   \
+#define WW_LIST_FOREACH(item, list, type)                               \
+  for (item = (type *) (list)->ww_list_sentinel.ww_list_next ;          \
+       item != (type *) &(list)->ww_list_sentinel ;                     \
        item = (type *) ((ww_list_item_t *) (item))->ww_list_next)
 
 /**
@@ -222,9 +223,11 @@ typedef struct ww_list_t ww_list_t;
  * Example Usage:
  *
  * class_foo_t *foo;
- * ww_list_foreach(foo, list, class_foo_t) {
+ * WW_ACQUIRE_THREAD(&list->lock);
+ * ww_list_foreach_rev(foo, list, class_foo_t) {
  *    do something;
  * }
+ * WW_RELEASE_THREAD(&list->lock);
  */
 #define WW_LIST_FOREACH_REV(item, list, type)                         \
   for (item = (type *) (list)->ww_list_sentinel.ww_list_prev ;      \
@@ -245,10 +248,12 @@ typedef struct ww_list_t ww_list_t;
  * Example Usage:
  *
  * class_foo_t *foo, *next;
+ * WW_ACQUIRE_THREAD(&list->lock);
  * ww_list_foreach_safe(foo, next, list, class_foo_t) {
  *    do something;
  *    ww_list_remove_item (list, (ww_list_item_t *) foo);
  * }
+ * WW_RELEASE_THREAD(&list->lock);
  */
 #define WW_LIST_FOREACH_SAFE(item, next, list, type)                  \
   for (item = (type *) (list)->ww_list_sentinel.ww_list_next,       \
@@ -270,10 +275,12 @@ typedef struct ww_list_t ww_list_t;
  * Example Usage:
  *
  * class_foo_t *foo, *next;
+ * WW_ACQUIRE_THREAD(&list->lock);
  * ww_list_foreach_safe(foo, next, list, class_foo_t) {
  *    do something;
  *    ww_list_remove_item (list, (ww_list_item_t *) foo);
  * }
+ * WW_RELEASE_THREAD(&list->lock);
  */
 #define WW_LIST_FOREACH_SAFE_REV(item, prev, list, type)              \
   for (item = (type *) (list)->ww_list_sentinel.ww_list_prev,       \
@@ -461,7 +468,7 @@ static inline size_t ww_list_get_size(ww_list_t* list)
  * caller -- they are responsible for WW_RELEASE()'ing it.
  *
  * If debugging is enabled (specifically, if --enable-debug was used
- * to configure PMIx), this is an O(N) operation because it checks
+ * to configure Warewulf), this is an O(N) operation because it checks
  * to see if the item is actually in the list first.
  *
  * This is an inlined function in compilers that support inlining, so

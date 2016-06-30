@@ -30,8 +30,8 @@
 #include "src/util/show_help.h"
 #include "src/mca/base/base.h"
 #include "src/mca/installdirs/base/base.h"
-#include "src/mca/bfrops/base/base.h"
 #include "src/mca/sec/base/base.h"
+#include "src/mca/dstore/base/base.h"
 #include WW_EVENT_HEADER
 
 #include "src/runtime/ww_rte.h"
@@ -81,11 +81,8 @@ int ww_finalize(void)
        much */
     ww_output_finalize();
 
-    /* close the bfrops */
-    (void) mca_base_framework_close(&ww_bfrops_base_framework);
-
-    /* stop the progress thread */
-    (void) ww_progress_thread_finalize(NULL);
+    /* close the dstore */
+    (void) mca_base_framework_close(&ww_dstore_base_framework);
 
     #if WW_NO_LIB_DESTRUCTOR
         ww_cleanup();

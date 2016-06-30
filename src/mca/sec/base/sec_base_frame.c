@@ -72,7 +72,7 @@ static ww_status_t ww_sec_open(mca_base_open_flag_t flags)
   return WW_SUCCESS;
 }
 
-MCA_BASE_FRAMEWORK_DECLARE(ww, sec, "PMIx Security Operations",
+MCA_BASE_FRAMEWORK_DECLARE(ww, sec, "Warewulf Security Operations",
                            NULL, ww_sec_open, ww_sec_close,
                            mca_sec_base_static_components, 0);
 

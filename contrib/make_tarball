@@ -327,13 +327,13 @@ if test $mac -eq 0; then
     check_gnu_version libtool $LT_TARGET_VERSION
 fi
 #
-# Verify that we're in a top PMIx dir
+# Verify that we're in a top Warewulf dir
 #
-echo "*** Checking to ensure in top-level PMIx directory..."
+echo "*** Checking to ensure in top-level Warewulf directory..."
 if test -f VERSION -a -f configure.ac -a -f config/ww.m4 ; then
     happy=1
 else
-    echo "Do not appear to be in an PMIx top directory.  Abort!"
+    echo "Do not appear to be in an Warewulf top directory.  Abort!"
     exit 1
 fi
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Script to pull down the latest markdown man pages from the PMIx
+# Script to pull down the latest markdown man pages from the Warewulf
 # git repo.  Iterate over them, converting each to an nroff man page
 # and also copying+committing them to the gh-pages branch.  Finally,
 # git push them back upstream (so that Github will render + serve them
